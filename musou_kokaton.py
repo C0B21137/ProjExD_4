@@ -298,6 +298,10 @@ def main():
             #     if score.value > 200:
             #         gras.add(Gravity(400))
             #         score.value -= 200
+            # if event.type == pg.KEYDOWN and event.key == pg.K_CAPSLOCK and len(shields) == 0:
+            #     if score.value > 50:
+            #         shields.add(Shield(bird, 400))
+            #         score.value -= 50
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
