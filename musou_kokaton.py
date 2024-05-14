@@ -4,7 +4,7 @@ import random
 import sys
 import time
 import pygame as pg
-
+#変更点
 
 WIDTH, HEIGHT = 1600, 900  # ゲームウィンドウの幅，高さ
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
