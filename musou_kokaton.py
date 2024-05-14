@@ -104,6 +104,11 @@ class Bird(pg.sprite.Sprite):
         if not (sum_mv[0] == 0 and sum_mv[1] == 0):
             self.dire = tuple(sum_mv)
             self.image = self.imgs[self.dire]
+        # if self.state == "hyper":
+        #     self.hyper_life -= 1
+        #     self.image = pg.transform.laplacian(self.image)
+        # if self.hyper_life < 0:
+        #     self.state = "normal"
         screen.blit(self.image, self.rect)
 
 
@@ -163,6 +168,8 @@ class Beam(pg.sprite.Sprite):
         self.rect.centery = bird.rect.centery+bird.rect.height*self.vy
         self.rect.centerx = bird.rect.centerx+bird.rect.width*self.vx
         self.speed = 10
+        # self.state = "normal"
+        # self.hyper_life = -1
 
     def update(self):
         """
@@ -322,10 +329,18 @@ def main():
             #     if score.value > 200:
             #         gras.add(Gravity(400))
             #         score.value -= 200
+<<<<<<< HEAD
             # if event.type == pg.KEYDOWN and event.key == pg.K_CAPSLOCK and len(shields) == 0:
             #     if score.value > 50:
             #         shields.add(Shield(bird, 400))
             #         score.value -= 50
+=======
+            # if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
+            #     if score.value > -1000:
+            #         bird.state = "hyper"
+            #         bird.hyper_life = 500
+            #         score.value -= 100
+>>>>>>> C0B21137/feature4
         screen.blit(bg_img, [0, 0])
 
         if tmr%200 == 0:  # 200フレームに1回，敵機を出現させる
@@ -353,12 +368,16 @@ def main():
         #     score.value += 1  # 1点アップ
         #     bird.change_img(6, screen)  # こうかとん喜びエフェクト
 
-        if len(pg.sprite.spritecollide(bird, bombs, True)) != 0:
-            bird.change_img(8, screen) # こうかとん悲しみエフェクト
-            score.update(screen)
-            pg.display.update()
-            time.sleep(2)
-            return
+        # for bomb in pg.sprite.spritecollide(bird, bombs, True):
+        #     if bird.state == "normal":
+        #         bird.change_img(8, screen) # こうかとん悲しみエフェクト
+        #         score.update(screen)
+        #         pg.display.update()
+        #         time.sleep(2)
+        #         return
+        #     if bird.state == "hyper":
+        #         exps.add(Explosion(bomb, 50))  # 爆発エフェクト
+        #         score.value += 1  # 1点アップ
 
         # gras.update()
         # gras.draw(screen)
