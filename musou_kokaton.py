@@ -100,6 +100,10 @@ class Bird(pg.sprite.Sprite):
             self.image = self.imgs[self.dire]
         screen.blit(self.image, self.rect)
 
+        #多分ここに変更が必要
+        # if 左シフトキー押してかつ移動してるとき
+        #   self.speed = 20
+
 
 class Bomb(pg.sprite.Sprite):
     """
