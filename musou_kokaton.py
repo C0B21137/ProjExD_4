@@ -4,32 +4,32 @@ import random
 import sys
 import time
 import pygame as pg
-#å¤‰æ›´ç‚¹
+#•ÏX“_
 
-WIDTH, HEIGHT = 1600, 900  # ã‚²ãƒ¼ãƒ ã‚¦ã‚£ãƒ³ãƒ‰ã‚¦ã®å¹…ï¼Œé«˜ã•
+WIDTH, HEIGHT = 1600, 900  # ƒQ[ƒ€ƒEƒBƒ“ƒhƒE‚Ì•C‚‚³
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 
 def check_bound(obj_rct:pg.Rect) -> tuple[bool, bool]:
     """
-    Rectã®ç”»é¢å†…å¤–åˆ¤å®šç”¨ã®é–¢æ•°
-    å¼•æ•°ï¼šã“ã†ã‹ã¨ã‚“Rectï¼Œã¾ãŸã¯ï¼Œçˆ†å¼¾Rectï¼Œã¾ãŸã¯ãƒ“ãƒ¼ãƒ Rect
-    æˆ»ã‚Šå€¤ï¼šæ¨ªæ–¹å‘åˆ¤å®šçµæœï¼Œç¸¦æ–¹å‘åˆ¤å®šçµæœï¼ˆTrueï¼šç”»é¢å†…ï¼Falseï¼šç”»é¢å¤–ï¼‰
+    Rect‚Ì‰æ–Ê“àŠO”»’è—p‚ÌŠÖ”
+    ˆø”F‚±‚¤‚©‚Æ‚ñRectC‚Ü‚½‚ÍC”š’eRectC‚Ü‚½‚Íƒr[ƒ€Rect
+    –ß‚è’lF‰¡•ûŒü”»’èŒ‹‰ÊCc•ûŒü”»’èŒ‹‰ÊiTrueF‰æ–Ê“à^FalseF‰æ–ÊŠOj
     """
     yoko, tate = True, True
-    if obj_rct.left < 0 or WIDTH < obj_rct.right:  # æ¨ªæ–¹å‘ã®ã¯ã¿å‡ºã—åˆ¤å®š
+    if obj_rct.left < 0 or WIDTH < obj_rct.right:  # ‰¡•ûŒü‚Ì‚Í‚İo‚µ”»’è
         yoko = False
-    if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:  # ç¸¦æ–¹å‘ã®ã¯ã¿å‡ºã—åˆ¤å®š
+    if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:  # c•ûŒü‚Ì‚Í‚İo‚µ”»’è
         tate = False
     return yoko, tate
 
 
 def calc_orientation(org: pg.Rect, dst: pg.Rect) -> tuple[float, float]:
     """
-    orgã‹ã‚‰è¦‹ã¦ï¼ŒdstãŒã©ã“ã«ã‚ã‚‹ã‹ã‚’è¨ˆç®—ã—ï¼Œæ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’ã‚¿ãƒ—ãƒ«ã§è¿”ã™
-    å¼•æ•°1 orgï¼šçˆ†å¼¾Surfaceã®Rect
-    å¼•æ•°2 dstï¼šã“ã†ã‹ã¨ã‚“Surfaceã®Rect
-    æˆ»ã‚Šå€¤ï¼šorgã‹ã‚‰è¦‹ãŸdstã®æ–¹å‘ãƒ™ã‚¯ãƒˆãƒ«ã‚’è¡¨ã™ã‚¿ãƒ—ãƒ«
+    org‚©‚çŒ©‚ÄCdst‚ª‚Ç‚±‚É‚ ‚é‚©‚ğŒvZ‚µC•ûŒüƒxƒNƒgƒ‹‚ğƒ^ƒvƒ‹‚Å•Ô‚·
+    ˆø”1 orgF”š’eSurface‚ÌRect
+    ˆø”2 dstF‚±‚¤‚©‚Æ‚ñSurface‚ÌRect
+    –ß‚è’lForg‚©‚çŒ©‚½dst‚Ì•ûŒüƒxƒNƒgƒ‹‚ğ•\‚·ƒ^ƒvƒ‹
     """
     x_diff, y_diff = dst.centerx-org.centerx, dst.centery-org.centery
     norm = math.sqrt(x_diff**2+y_diff**2)
@@ -38,9 +38,9 @@ def calc_orientation(org: pg.Rect, dst: pg.Rect) -> tuple[float, float]:
 
 class Bird(pg.sprite.Sprite):
     """
-    ã‚²ãƒ¼ãƒ ã‚­ãƒ£ãƒ©ã‚¯ã‚¿ãƒ¼ï¼ˆã“ã†ã‹ã¨ã‚“ï¼‰ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    ƒQ[ƒ€ƒLƒƒƒ‰ƒNƒ^[i‚±‚¤‚©‚Æ‚ñj‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
-    delta = {  # æŠ¼ä¸‹ã‚­ãƒ¼ã¨ç§»å‹•é‡ã®è¾æ›¸
+    delta = {  # ‰Ÿ‰ºƒL[‚ÆˆÚ“®—Ê‚Ì«‘
         pg.K_UP: (0, -1),
         pg.K_DOWN: (0, +1),
         pg.K_LEFT: (-1, 0),
@@ -49,22 +49,22 @@ class Bird(pg.sprite.Sprite):
 
     def __init__(self, num: int, xy: tuple[int, int]):
         """
-        ã“ã†ã‹ã¨ã‚“ç”»åƒSurfaceã‚’ç”Ÿæˆã™ã‚‹
-        å¼•æ•°1 numï¼šã“ã†ã‹ã¨ã‚“ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«åã®ç•ªå·
-        å¼•æ•°2 xyï¼šã“ã†ã‹ã¨ã‚“ç”»åƒã®ä½ç½®åº§æ¨™ã‚¿ãƒ—ãƒ«
+        ‚±‚¤‚©‚Æ‚ñ‰æ‘œSurface‚ğ¶¬‚·‚é
+        ˆø”1 numF‚±‚¤‚©‚Æ‚ñ‰æ‘œƒtƒ@ƒCƒ‹–¼‚Ì”Ô†
+        ˆø”2 xyF‚±‚¤‚©‚Æ‚ñ‰æ‘œ‚ÌˆÊ’uÀ•Wƒ^ƒvƒ‹
         """
         super().__init__()
         img0 = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
-        img = pg.transform.flip(img0, True, False)  # ãƒ‡ãƒ•ã‚©ãƒ«ãƒˆã®ã“ã†ã‹ã¨ã‚“
+        img = pg.transform.flip(img0, True, False)  # ƒfƒtƒHƒ‹ƒg‚Ì‚±‚¤‚©‚Æ‚ñ
         self.imgs = {
-            (+1, 0): img,  # å³
-            (+1, -1): pg.transform.rotozoom(img, 45, 1.0),  # å³ä¸Š
-            (0, -1): pg.transform.rotozoom(img, 90, 1.0),  # ä¸Š
-            (-1, -1): pg.transform.rotozoom(img0, -45, 1.0),  # å·¦ä¸Š
-            (-1, 0): img0,  # å·¦
-            (-1, +1): pg.transform.rotozoom(img0, 45, 1.0),  # å·¦ä¸‹
-            (0, +1): pg.transform.rotozoom(img, -90, 1.0),  # ä¸‹
-            (+1, +1): pg.transform.rotozoom(img, -45, 1.0),  # å³ä¸‹
+            (+1, 0): img,  # ‰E
+            (+1, -1): pg.transform.rotozoom(img, 45, 1.0),  # ‰Eã
+            (0, -1): pg.transform.rotozoom(img, 90, 1.0),  # ã
+            (-1, -1): pg.transform.rotozoom(img0, -45, 1.0),  # ¶ã
+            (-1, 0): img0,  # ¶
+            (-1, +1): pg.transform.rotozoom(img0, 45, 1.0),  # ¶‰º
+            (0, +1): pg.transform.rotozoom(img, -90, 1.0),  # ‰º
+            (+1, +1): pg.transform.rotozoom(img, -45, 1.0),  # ‰E‰º
         }
         self.dire = (+1, 0)
         self.image = self.imgs[self.dire]
@@ -74,18 +74,18 @@ class Bird(pg.sprite.Sprite):
 
     def change_img(self, num: int, screen: pg.Surface):
         """
-        ã“ã†ã‹ã¨ã‚“ç”»åƒã‚’åˆ‡ã‚Šæ›¿ãˆï¼Œç”»é¢ã«è»¢é€ã™ã‚‹
-        å¼•æ•°1 numï¼šã“ã†ã‹ã¨ã‚“ç”»åƒãƒ•ã‚¡ã‚¤ãƒ«åã®ç•ªå·
-        å¼•æ•°2 screenï¼šç”»é¢Surface
+        ‚±‚¤‚©‚Æ‚ñ‰æ‘œ‚ğØ‚è‘Ö‚¦C‰æ–Ê‚É“]‘—‚·‚é
+        ˆø”1 numF‚±‚¤‚©‚Æ‚ñ‰æ‘œƒtƒ@ƒCƒ‹–¼‚Ì”Ô†
+        ˆø”2 screenF‰æ–ÊSurface
         """
         self.image = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
         screen.blit(self.image, self.rect)
 
     def update(self, key_lst: list[bool], screen: pg.Surface):
         """
-        æŠ¼ä¸‹ã‚­ãƒ¼ã«å¿œã˜ã¦ã“ã†ã‹ã¨ã‚“ã‚’ç§»å‹•ã•ã›ã‚‹
-        å¼•æ•°1 key_lstï¼šæŠ¼ä¸‹ã‚­ãƒ¼ã®çœŸç†å€¤ãƒªã‚¹ãƒˆ
-        å¼•æ•°2 screenï¼šç”»é¢Surface
+        ‰Ÿ‰ºƒL[‚É‰‚¶‚Ä‚±‚¤‚©‚Æ‚ñ‚ğˆÚ“®‚³‚¹‚é
+        ˆø”1 key_lstF‰Ÿ‰ºƒL[‚Ì^—’lƒŠƒXƒg
+        ˆø”2 screenF‰æ–ÊSurface
         """
         #speed up
         # if key_lst[pg.K_LSHIFT]:
@@ -114,34 +114,33 @@ class Bird(pg.sprite.Sprite):
 
 class Bomb(pg.sprite.Sprite):
     """
-    çˆ†å¼¾ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    ”š’e‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
     colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
 
     def __init__(self, emy: "Enemy", bird: Bird):
         """
-        çˆ†å¼¾å††Surfaceã‚’ç”Ÿæˆã™ã‚‹
-        å¼•æ•°1 emyï¼šçˆ†å¼¾ã‚’æŠ•ä¸‹ã™ã‚‹æ•µæ©Ÿ
-        å¼•æ•°2 birdï¼šæ”»æ’ƒå¯¾è±¡ã®ã“ã†ã‹ã¨ã‚“
+        ”š’e‰~Surface‚ğ¶¬‚·‚é
+        ˆø”1 emyF”š’e‚ğ“Š‰º‚·‚é“G‹@
+        ˆø”2 birdFUŒ‚‘ÎÛ‚Ì‚±‚¤‚©‚Æ‚ñ
         """
         super().__init__()
-        rad = random.randint(10, 50)  # çˆ†å¼¾å††ã®åŠå¾„ï¼š10ä»¥ä¸Š50ä»¥ä¸‹ã®ä¹±æ•°
+        rad = random.randint(10, 50)  # ”š’e‰~‚Ì”¼ŒaF10ˆÈã50ˆÈ‰º‚Ì—”
         self.image = pg.Surface((2*rad, 2*rad))
-        color = random.choice(__class__.colors)  # çˆ†å¼¾å††ã®è‰²ï¼šã‚¯ãƒ©ã‚¹å¤‰æ•°ã‹ã‚‰ãƒ©ãƒ³ãƒ€ãƒ é¸æŠ
+        color = random.choice(__class__.colors)  # ”š’e‰~‚ÌFFƒNƒ‰ƒX•Ï”‚©‚çƒ‰ƒ“ƒ_ƒ€‘I‘ğ
         pg.draw.circle(self.image, color, (rad, rad), rad)
         self.image.set_colorkey((0, 0, 0))
         self.rect = self.image.get_rect()
-        # çˆ†å¼¾ã‚’æŠ•ä¸‹ã™ã‚‹emyã‹ã‚‰è¦‹ãŸæ”»æ’ƒå¯¾è±¡ã®birdã®æ–¹å‘ã‚’è¨ˆç®—
+        # ”š’e‚ğ“Š‰º‚·‚éemy‚©‚çŒ©‚½UŒ‚‘ÎÛ‚Ìbird‚Ì•ûŒü‚ğŒvZ
         self.vx, self.vy = calc_orientation(emy.rect, bird.rect)  
         self.rect.centerx = emy.rect.centerx
         self.rect.centery = emy.rect.centery+emy.rect.height/2
         self.speed = 6
-        # self.state="active"
 
     def update(self):
         """
-        çˆ†å¼¾ã‚’é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«self.vx, self.vyã«åŸºã¥ãç§»å‹•ã•ã›ã‚‹
-        å¼•æ•° screenï¼šç”»é¢Surface
+        ”š’e‚ğ‘¬“xƒxƒNƒgƒ‹self.vx, self.vy‚ÉŠî‚Ã‚«ˆÚ“®‚³‚¹‚é
+        ˆø” screenF‰æ–ÊSurface
         """
         self.rect.move_ip(self.speed*self.vx, self.speed*self.vy)
         if check_bound(self.rect) != (True, True):
@@ -150,13 +149,13 @@ class Bomb(pg.sprite.Sprite):
 
 class Beam(pg.sprite.Sprite):
     """
-    ãƒ“ãƒ¼ãƒ ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    ƒr[ƒ€‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
     def __init__(self, bird: Bird):
     #def __init__(self, bird: Bird, angle0: float=0):
         """
-        ãƒ“ãƒ¼ãƒ ç”»åƒSurfaceã‚’ç”Ÿæˆã™ã‚‹
-        å¼•æ•° birdï¼šãƒ“ãƒ¼ãƒ ã‚’æ”¾ã¤ã“ã†ã‹ã¨ã‚“
+        ƒr[ƒ€‰æ‘œSurface‚ğ¶¬‚·‚é
+        ˆø” birdFƒr[ƒ€‚ğ•ú‚Â‚±‚¤‚©‚Æ‚ñ
         """
         super().__init__()
         self.vx, self.vy = bird.dire
@@ -174,8 +173,8 @@ class Beam(pg.sprite.Sprite):
 
     def update(self):
         """
-        ãƒ“ãƒ¼ãƒ ã‚’é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«self.vx, self.vyã«åŸºã¥ãç§»å‹•ã•ã›ã‚‹
-        å¼•æ•° screenï¼šç”»é¢Surface
+        ƒr[ƒ€‚ğ‘¬“xƒxƒNƒgƒ‹self.vx, self.vy‚ÉŠî‚Ã‚«ˆÚ“®‚³‚¹‚é
+        ˆø” screenF‰æ–ÊSurface
         """
         self.rect.move_ip(self.speed*self.vx, self.speed*self.vy)
         if check_bound(self.rect) != (True, True):
@@ -184,32 +183,32 @@ class Beam(pg.sprite.Sprite):
 
 class NeoBeam:
     """
-    ãƒã‚ªãƒ“ãƒ ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    ƒlƒIƒrƒ€‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
     def __init__(self, bird: Bird, num: int):
         """
-        å¼•æ•°1 birdï¼šãƒ“ãƒ¼ãƒ ã‚’æ”¾ã¤ã“ã†ã‹ã¨ã‚“
-        å¼•æ•°2 numï¼šç”Ÿæˆã™ã‚‹ãƒ“ãƒ¼ãƒ ã®æ•°
+        ˆø”1 birdFƒr[ƒ€‚ğ•ú‚Â‚±‚¤‚©‚Æ‚ñ
+        ˆø”2 numF¶¬‚·‚éƒr[ƒ€‚Ì”
         """
         self.bird = bird
         self.num = num
 
     def gen_beams(self) -> list[Beam]:
         """
-        è¤‡æ•°æ–¹å‘ã®ãƒ“ãƒ¼ãƒ ã‚’ç”Ÿæˆã™ã‚‹
+        •¡”•ûŒü‚Ìƒr[ƒ€‚ğ¶¬‚·‚é
         """
         return [Beam(self.bird, angle) for angle in range(-50, +51, int(100/(self.num-1)))]  
 
 
 class Explosion(pg.sprite.Sprite):
     """
-    çˆ†ç™ºã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    ”š”­‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
     def __init__(self, obj: "Bomb|Enemy", life: int):
         """
-        çˆ†å¼¾ãŒçˆ†ç™ºã™ã‚‹ã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’ç”Ÿæˆã™ã‚‹
-        å¼•æ•°1 objï¼šçˆ†ç™ºã™ã‚‹Bombã¾ãŸã¯æ•µæ©Ÿã‚¤ãƒ³ã‚¹ã‚¿ãƒ³ã‚¹
-        å¼•æ•°2 lifeï¼šçˆ†ç™ºæ™‚é–“
+        ”š’e‚ª”š”­‚·‚éƒGƒtƒFƒNƒg‚ğ¶¬‚·‚é
+        ˆø”1 objF”š”­‚·‚éBomb‚Ü‚½‚Í“G‹@ƒCƒ“ƒXƒ^ƒ“ƒX
+        ˆø”2 lifeF”š”­ŠÔ
         """
         super().__init__()
         img = pg.image.load(f"fig/explosion.gif")
@@ -220,8 +219,8 @@ class Explosion(pg.sprite.Sprite):
 
     def update(self):
         """
-        çˆ†ç™ºæ™‚é–“ã‚’1æ¸›ç®—ã—ãŸçˆ†ç™ºçµŒéæ™‚é–“_lifeã«å¿œã˜ã¦çˆ†ç™ºç”»åƒã‚’åˆ‡ã‚Šæ›¿ãˆã‚‹ã“ã¨ã§
-        çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆã‚’è¡¨ç¾ã™ã‚‹
+        ”š”­ŠÔ‚ğ1Œ¸Z‚µ‚½”š”­Œo‰ßŠÔ_life‚É‰‚¶‚Ä”š”­‰æ‘œ‚ğØ‚è‘Ö‚¦‚é‚±‚Æ‚Å
+        ”š”­ƒGƒtƒFƒNƒg‚ğ•\Œ»‚·‚é
         """
         self.life -= 1
         self.image = self.imgs[self.life//10%2]
@@ -231,7 +230,7 @@ class Explosion(pg.sprite.Sprite):
 
 class Enemy(pg.sprite.Sprite):
     """
-    æ•µæ©Ÿã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+    “G‹@‚ÉŠÖ‚·‚éƒNƒ‰ƒX
     """
     imgs = [pg.image.load(f"fig/alien{i}.png") for i in range(1, 4)]
     
@@ -241,15 +240,15 @@ class Enemy(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = random.randint(0, WIDTH), 0
         self.vy = +6
-        self.bound = random.randint(50, HEIGHT/2)  # åœæ­¢ä½ç½®
-        self.state = "down"  # é™ä¸‹çŠ¶æ…‹oråœæ­¢çŠ¶æ…‹
-        self.interval = random.randint(50, 300)  # çˆ†å¼¾æŠ•ä¸‹ã‚¤ãƒ³ã‚¿ãƒ¼ãƒãƒ«
+        self.bound = random.randint(50, HEIGHT/2)  # ’â~ˆÊ’u
+        self.state = "down"  # ~‰ºó‘Ôor’â~ó‘Ô
+        self.interval = random.randint(50, 300)  # ”š’e“Š‰ºƒCƒ“ƒ^[ƒoƒ‹
 
     def update(self):
         """
-        æ•µæ©Ÿã‚’é€Ÿåº¦ãƒ™ã‚¯ãƒˆãƒ«self.vyã«åŸºã¥ãç§»å‹•ï¼ˆé™ä¸‹ï¼‰ã•ã›ã‚‹
-        ãƒ©ãƒ³ãƒ€ãƒ ã«æ±ºã‚ãŸåœæ­¢ä½ç½®_boundã¾ã§é™ä¸‹ã—ãŸã‚‰ï¼Œ_stateã‚’åœæ­¢çŠ¶æ…‹ã«å¤‰æ›´ã™ã‚‹
-        å¼•æ•° screenï¼šç”»é¢Surface
+        “G‹@‚ğ‘¬“xƒxƒNƒgƒ‹self.vy‚ÉŠî‚Ã‚«ˆÚ“®i~‰ºj‚³‚¹‚é
+        ƒ‰ƒ“ƒ_ƒ€‚ÉŒˆ‚ß‚½’â~ˆÊ’u_bound‚Ü‚Å~‰º‚µ‚½‚çC_state‚ğ’â~ó‘Ô‚É•ÏX‚·‚é
+        ˆø” screenF‰æ–ÊSurface
         """
         if self.rect.centery > self.bound:
             self.vy = 0
@@ -259,12 +258,12 @@ class Enemy(pg.sprite.Sprite):
 
 # class Gravity(pg.sprite.Sprite):
 #     """
-#     ç”»é¢å…¨ä½“ã«ç”Ÿæˆã•ã‚Œã‚‹é‡åŠ›å ´ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
+#     ‰æ–Ê‘S‘Ì‚É¶¬‚³‚ê‚éd—Íê‚ÉŠÖ‚·‚éƒNƒ‰ƒX
 #     """
 #     def __init__(self, life):
 #         """
-#         ç”»é¢å…¨ä½“ã«é‡åŠ›å ´ã‚’ç”Ÿæˆã™ã‚‹
-#         å¼•æ•° lifeï¼šç™ºå‹•æ™‚é–“
+#         ‰æ–Ê‘S‘Ì‚Éd—Íê‚ğ¶¬‚·‚é
+#         ˆø” lifeF”­“®ŠÔ
 #         """  
 #         super().__init__()
 #         self.image = pg.Surface((WIDTH, HEIGHT))
@@ -275,41 +274,18 @@ class Enemy(pg.sprite.Sprite):
 
 #     def update(self):
 #         """
-#         ç™ºå‹•æ™‚é–“ã‚’1æ¸›ç®—ã—ï¼Œç™ºå‹•æ™‚é–“ä¸­ã¯é‡åŠ›å ´ã‚’æœ‰åŠ¹ã«ã™ã‚‹
+#         ”­“®ŠÔ‚ğ1Œ¸Z‚µC”­“®ŠÔ’†‚Íd—Íê‚ğ—LŒø‚É‚·‚é
 #         """
 #         self.life -= 1
 #         if self.life < 0:
 #             self.kill()
 
 
-# class EMP:
-#     """
-#     é›»ç£ãƒ‘ãƒ«ã‚¹ã«é–¢ã™ã‚‹ã‚¯ãƒ©ã‚¹
-#     """
-#     def __init__(self, emys: pg.sprite.Group, bombs: pg.sprite.Group, screen: pg.Surface):
-#         """
-#         é›»ç£ãƒ‘ãƒ«ã‚¹ã«å½±éŸ¿ã‚’å—ã‘ã‚‹ã‚ªãƒ–ã‚¸ã‚§ã‚¯ãƒˆã‚’å–å¾—ã™ã‚‹
-#         """
-#         for emy in emys:
-#             emy.interval = math.inf
-#             emy.image = pg.transform.laplacian(emy.image)
-#             emy.image.set_colorkey((0, 0, 0))
-#         for bomb in bombs:
-#             bomb.speed /= 2
-#             bomb.state = "inactive"
-#         img = pg.Surface((WIDTH, HEIGHT))
-#         pg.draw.rect(img, (255, 255, 0), (0, 0, WIDTH, HEIGHT))
-#         img.set_alpha(100)
-#         screen.blit(img, [0, 0])
-#         pg.display.update()
-#         time.sleep(0.05)
-
-
 class Score:
     """
-    æ‰“ã¡è½ã¨ã—ãŸçˆ†å¼¾ï¼Œæ•µæ©Ÿã®æ•°ã‚’ã‚¹ã‚³ã‚¢ã¨ã—ã¦è¡¨ç¤ºã™ã‚‹ã‚¯ãƒ©ã‚¹
-    çˆ†å¼¾ï¼š1ç‚¹
-    æ•µæ©Ÿï¼š10ç‚¹
+    ‘Å‚¿—‚Æ‚µ‚½”š’eC“G‹@‚Ì”‚ğƒXƒRƒA‚Æ‚µ‚Ä•\¦‚·‚éƒNƒ‰ƒX
+    ”š’eF1“_
+    “G‹@F10“_
     """
     def __init__(self):
         self.font = pg.font.Font(None, 50)
@@ -325,7 +301,7 @@ class Score:
 
 
 def main():
-    pg.display.set_caption("çœŸï¼ã“ã†ã‹ã¨ã‚“ç„¡åŒ")
+    pg.display.set_caption("^I‚±‚¤‚©‚Æ‚ñ–³‘o")
     screen = pg.display.set_mode((WIDTH, HEIGHT))
     bg_img = pg.image.load(f"fig/pg_bg.jpg")
     score = Score()
@@ -353,73 +329,424 @@ def main():
             #     if score.value > 200:
             #         gras.add(Gravity(400))
             #         score.value -= 200
-<<<<<<< HEAD
-<<<<<<< HEAD
             # if event.type == pg.KEYDOWN and event.key == pg.K_CAPSLOCK and len(shields) == 0:
             #     if score.value > 50:
             #         shields.add(Shield(bird, 400))
             #         score.value -= 50
-=======
             # if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
             #     if score.value > -1000:
             #         bird.state = "hyper"
             #         bird.hyper_life = 500
             #         score.value -= 100
->>>>>>> C0B21137/feature4
-=======
-            # if event.type == pg.KEYDOWN and event.key == pg.K_e:
-            #     if score.value > 20:
-            #         EMP(emys, bombs, screen)
-            #         score.value -= 20
->>>>>>> C0B21137/feature3
         screen.blit(bg_img, [0, 0])
 
-        if tmr%200 == 0:  # 200ãƒ•ãƒ¬ãƒ¼ãƒ ã«1å›ï¼Œæ•µæ©Ÿã‚’å‡ºç¾ã•ã›ã‚‹
+        if tmr%200 == 0:  # 200ƒtƒŒ[ƒ€‚É1‰ñC“G‹@‚ğoŒ»‚³‚¹‚é
             emys.add(Enemy())
 
         for emy in emys:
             if emy.state == "stop" and tmr%emy.interval == 0:
-                # æ•µæ©ŸãŒåœæ­¢çŠ¶æ…‹ã«å…¥ã£ãŸã‚‰ï¼Œintervalã«å¿œã˜ã¦çˆ†å¼¾æŠ•ä¸‹
+                # “G‹@‚ª’â~ó‘Ô‚É“ü‚Á‚½‚çCinterval‚É‰‚¶‚Ä”š’e“Š‰º
                 bombs.add(Bomb(emy, bird))
 
         for emy in pg.sprite.groupcollide(emys, beams, True, True).keys():
-            exps.add(Explosion(emy, 100))  # çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-            score.value += 10  # 10ç‚¹ã‚¢ãƒƒãƒ—
-            bird.change_img(6, screen)  # ã“ã†ã‹ã¨ã‚“å–œã³ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+            exps.add(Explosion(emy, 100))  # ”š”­ƒGƒtƒFƒNƒg
+            score.value += 10  # 10“_ƒAƒbƒv
+            bird.change_img(6, screen)  # ‚±‚¤‚©‚Æ‚ñŠì‚ÑƒGƒtƒFƒNƒg
 
         for bomb in pg.sprite.groupcollide(bombs, beams, True, True).keys():
-            exps.add(Explosion(bomb, 50))  # çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-            score.value += 1  # 1ç‚¹ã‚¢ãƒƒãƒ—
+            exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+            score.value += 1  # 1“_ƒAƒbƒv
         
         # for bomb in pg.sprite.groupcollide(bombs, gras, True, False):
-        #     exps.add(Explosion(bomb, 50))  # çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-        #     score.value += 1  # 1ç‚¹ã‚¢ãƒƒãƒ—
+        #     exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+        #     score.value += 1  # 1“_ƒAƒbƒv
         # for emy in pg.sprite.groupcollide(emys, gras, True, False):
-        #     exps.add(Explosion(emy, 100))  # çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-        #     score.value += 1  # 1ç‚¹ã‚¢ãƒƒãƒ—
-        #     bird.change_img(6, screen)  # ã“ã†ã‹ã¨ã‚“å–œã³ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+        #     exps.add(Explosion(emy, 100))  # ”š”­ƒGƒtƒFƒNƒg
+        #     score.value += 1  # 1“_ƒAƒbƒv
+        #     bird.change_img(6, screen)  # ‚±‚¤‚©‚Æ‚ñŠì‚ÑƒGƒtƒFƒNƒg
 
-<<<<<<< HEAD
         # for bomb in pg.sprite.spritecollide(bird, bombs, True):
         #     if bird.state == "normal":
-        #         bird.change_img(8, screen) # ã“ã†ã‹ã¨ã‚“æ‚²ã—ã¿ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
+        #         bird.change_img(8, screen) # ‚±‚¤‚©‚Æ‚ñ”ß‚µ‚İƒGƒtƒFƒNƒg
         #         score.update(screen)
         #         pg.display.update()
         #         time.sleep(2)
         #         return
         #     if bird.state == "hyper":
-        #         exps.add(Explosion(bomb, 50))  # çˆ†ç™ºã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-        #         score.value += 1  # 1ç‚¹ã‚¢ãƒƒãƒ—
-=======
-        for bomb in pg.sprite.spritecollide(bird, bombs, True):
-            if bomb.state == "inactive":
-                continue
-            bird.change_img(8, screen) # ã“ã†ã‹ã¨ã‚“æ‚²ã—ã¿ã‚¨ãƒ•ã‚§ã‚¯ãƒˆ
-            score.update(screen)
-            pg.display.update()
-            time.sleep(2)
-            return
->>>>>>> C0B21137/feature3
+        #         exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+        #         score.value += 1  # 1“_ƒAƒbƒv
+
+        # gras.update()
+        # gras.draw(screen)
+        bird.update(key_lst, screen)
+        beams.update()
+        beams.draw(screen)
+        emys.update()
+        emys.draw(screen)
+        bombs.update()
+        bombs.draw(screen)
+        exps.update()
+        exps.draw(screen)
+        score.update(screen)
+        pg.display.update()
+        tmr += 1
+        clock.tick(50)
+
+
+if __name__ == "__main__":
+    pg.init()
+    main()
+    pg.quit()
+    sys.exit()
+import math
+import os
+import random
+import sys
+import time
+import pygame as pg
+#•ÏX“_
+
+WIDTH, HEIGHT = 1600, 900  # ƒQ[ƒ€ƒEƒBƒ“ƒhƒE‚Ì•C‚‚³
+os.chdir(os.path.dirname(os.path.abspath(__file__)))
+
+
+def check_bound(obj_rct:pg.Rect) -> tuple[bool, bool]:
+    """
+    Rect‚Ì‰æ–Ê“àŠO”»’è—p‚ÌŠÖ”
+    ˆø”F‚±‚¤‚©‚Æ‚ñRectC‚Ü‚½‚ÍC”š’eRectC‚Ü‚½‚Íƒr[ƒ€Rect
+    –ß‚è’lF‰¡•ûŒü”»’èŒ‹‰ÊCc•ûŒü”»’èŒ‹‰ÊiTrueF‰æ–Ê“à^FalseF‰æ–ÊŠOj
+    """
+    yoko, tate = True, True
+    if obj_rct.left < 0 or WIDTH < obj_rct.right:  # ‰¡•ûŒü‚Ì‚Í‚İo‚µ”»’è
+        yoko = False
+    if obj_rct.top < 0 or HEIGHT < obj_rct.bottom:  # c•ûŒü‚Ì‚Í‚İo‚µ”»’è
+        tate = False
+    return yoko, tate
+
+
+def calc_orientation(org: pg.Rect, dst: pg.Rect) -> tuple[float, float]:
+    """
+    org‚©‚çŒ©‚ÄCdst‚ª‚Ç‚±‚É‚ ‚é‚©‚ğŒvZ‚µC•ûŒüƒxƒNƒgƒ‹‚ğƒ^ƒvƒ‹‚Å•Ô‚·
+    ˆø”1 orgF”š’eSurface‚ÌRect
+    ˆø”2 dstF‚±‚¤‚©‚Æ‚ñSurface‚ÌRect
+    –ß‚è’lForg‚©‚çŒ©‚½dst‚Ì•ûŒüƒxƒNƒgƒ‹‚ğ•\‚·ƒ^ƒvƒ‹
+    """
+    x_diff, y_diff = dst.centerx-org.centerx, dst.centery-org.centery
+    norm = math.sqrt(x_diff**2+y_diff**2)
+    return x_diff/norm, y_diff/norm
+
+
+class Bird(pg.sprite.Sprite):
+    """
+    ƒQ[ƒ€ƒLƒƒƒ‰ƒNƒ^[i‚±‚¤‚©‚Æ‚ñj‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+    """
+    delta = {  # ‰Ÿ‰ºƒL[‚ÆˆÚ“®—Ê‚Ì«‘
+        pg.K_UP: (0, -1),
+        pg.K_DOWN: (0, +1),
+        pg.K_LEFT: (-1, 0),
+        pg.K_RIGHT: (+1, 0),
+    }
+
+    def __init__(self, num: int, xy: tuple[int, int]):
+        """
+        ‚±‚¤‚©‚Æ‚ñ‰æ‘œSurface‚ğ¶¬‚·‚é
+        ˆø”1 numF‚±‚¤‚©‚Æ‚ñ‰æ‘œƒtƒ@ƒCƒ‹–¼‚Ì”Ô†
+        ˆø”2 xyF‚±‚¤‚©‚Æ‚ñ‰æ‘œ‚ÌˆÊ’uÀ•Wƒ^ƒvƒ‹
+        """
+        super().__init__()
+        img0 = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
+        img = pg.transform.flip(img0, True, False)  # ƒfƒtƒHƒ‹ƒg‚Ì‚±‚¤‚©‚Æ‚ñ
+        self.imgs = {
+            (+1, 0): img,  # ‰E
+            (+1, -1): pg.transform.rotozoom(img, 45, 1.0),  # ‰Eã
+            (0, -1): pg.transform.rotozoom(img, 90, 1.0),  # ã
+            (-1, -1): pg.transform.rotozoom(img0, -45, 1.0),  # ¶ã
+            (-1, 0): img0,  # ¶
+            (-1, +1): pg.transform.rotozoom(img0, 45, 1.0),  # ¶‰º
+            (0, +1): pg.transform.rotozoom(img, -90, 1.0),  # ‰º
+            (+1, +1): pg.transform.rotozoom(img, -45, 1.0),  # ‰E‰º
+        }
+        self.dire = (+1, 0)
+        self.image = self.imgs[self.dire]
+        self.rect = self.image.get_rect()
+        self.rect.center = xy
+        self.speed = 10
+
+    def change_img(self, num: int, screen: pg.Surface):
+        """
+        ‚±‚¤‚©‚Æ‚ñ‰æ‘œ‚ğØ‚è‘Ö‚¦C‰æ–Ê‚É“]‘—‚·‚é
+        ˆø”1 numF‚±‚¤‚©‚Æ‚ñ‰æ‘œƒtƒ@ƒCƒ‹–¼‚Ì”Ô†
+        ˆø”2 screenF‰æ–ÊSurface
+        """
+        self.image = pg.transform.rotozoom(pg.image.load(f"fig/{num}.png"), 0, 2.0)
+        screen.blit(self.image, self.rect)
+
+    def update(self, key_lst: list[bool], screen: pg.Surface):
+        """
+        ‰Ÿ‰ºƒL[‚É‰‚¶‚Ä‚±‚¤‚©‚Æ‚ñ‚ğˆÚ“®‚³‚¹‚é
+        ˆø”1 key_lstF‰Ÿ‰ºƒL[‚Ì^—’lƒŠƒXƒg
+        ˆø”2 screenF‰æ–ÊSurface
+        """
+        #speed up
+        # if key_lst[pg.K_LSHIFT]:
+        #     self.speed = 20
+        # else:
+        #     self.speed = 10
+
+        sum_mv = [0, 0]
+        for k, mv in __class__.delta.items():
+            if key_lst[k]:
+                sum_mv[0] += mv[0]
+                sum_mv[1] += mv[1]
+        self.rect.move_ip(self.speed*sum_mv[0], self.speed*sum_mv[1])
+        if check_bound(self.rect) != (True, True):
+            self.rect.move_ip(-self.speed*sum_mv[0], -self.speed*sum_mv[1])
+        if not (sum_mv[0] == 0 and sum_mv[1] == 0):
+            self.dire = tuple(sum_mv)
+            self.image = self.imgs[self.dire]
+        # if self.state == "hyper":
+        #     self.hyper_life -= 1
+        #     self.image = pg.transform.laplacian(self.image)
+        # if self.hyper_life < 0:
+        #     self.state = "normal"
+        screen.blit(self.image, self.rect)
+
+
+class Bomb(pg.sprite.Sprite):
+    """
+    ”š’e‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+    """
+    colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255), (0, 255, 255)]
+
+    def __init__(self, emy: "Enemy", bird: Bird):
+        """
+        ”š’e‰~Surface‚ğ¶¬‚·‚é
+        ˆø”1 emyF”š’e‚ğ“Š‰º‚·‚é“G‹@
+        ˆø”2 birdFUŒ‚‘ÎÛ‚Ì‚±‚¤‚©‚Æ‚ñ
+        """
+        super().__init__()
+        rad = random.randint(10, 50)  # ”š’e‰~‚Ì”¼ŒaF10ˆÈã50ˆÈ‰º‚Ì—”
+        self.image = pg.Surface((2*rad, 2*rad))
+        color = random.choice(__class__.colors)  # ”š’e‰~‚ÌFFƒNƒ‰ƒX•Ï”‚©‚çƒ‰ƒ“ƒ_ƒ€‘I‘ğ
+        pg.draw.circle(self.image, color, (rad, rad), rad)
+        self.image.set_colorkey((0, 0, 0))
+        self.rect = self.image.get_rect()
+        # ”š’e‚ğ“Š‰º‚·‚éemy‚©‚çŒ©‚½UŒ‚‘ÎÛ‚Ìbird‚Ì•ûŒü‚ğŒvZ
+        self.vx, self.vy = calc_orientation(emy.rect, bird.rect)  
+        self.rect.centerx = emy.rect.centerx
+        self.rect.centery = emy.rect.centery+emy.rect.height/2
+        self.speed = 6
+
+    def update(self):
+        """
+        ”š’e‚ğ‘¬“xƒxƒNƒgƒ‹self.vx, self.vy‚ÉŠî‚Ã‚«ˆÚ“®‚³‚¹‚é
+        ˆø” screenF‰æ–ÊSurface
+        """
+        self.rect.move_ip(self.speed*self.vx, self.speed*self.vy)
+        if check_bound(self.rect) != (True, True):
+            self.kill()
+
+
+class Beam(pg.sprite.Sprite):
+    """
+    ƒr[ƒ€‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+    """
+    def __init__(self, bird: Bird):
+        """
+        ƒr[ƒ€‰æ‘œSurface‚ğ¶¬‚·‚é
+        ˆø” birdFƒr[ƒ€‚ğ•ú‚Â‚±‚¤‚©‚Æ‚ñ
+        """
+        super().__init__()
+        self.vx, self.vy = bird.dire
+        angle = math.degrees(math.atan2(-self.vy, self.vx))
+        self.image = pg.transform.rotozoom(pg.image.load(f"fig/beam.png"), angle, 2.0)
+        self.vx = math.cos(math.radians(angle))
+        self.vy = -math.sin(math.radians(angle))
+        self.rect = self.image.get_rect()
+        self.rect.centery = bird.rect.centery+bird.rect.height*self.vy
+        self.rect.centerx = bird.rect.centerx+bird.rect.width*self.vx
+        self.speed = 10
+        # self.state = "normal"
+        # self.hyper_life = -1
+
+    def update(self):
+        """
+        ƒr[ƒ€‚ğ‘¬“xƒxƒNƒgƒ‹self.vx, self.vy‚ÉŠî‚Ã‚«ˆÚ“®‚³‚¹‚é
+        ˆø” screenF‰æ–ÊSurface
+        """
+        self.rect.move_ip(self.speed*self.vx, self.speed*self.vy)
+        if check_bound(self.rect) != (True, True):
+            self.kill()
+
+
+class Explosion(pg.sprite.Sprite):
+    """
+    ”š”­‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+    """
+    def __init__(self, obj: "Bomb|Enemy", life: int):
+        """
+        ”š’e‚ª”š”­‚·‚éƒGƒtƒFƒNƒg‚ğ¶¬‚·‚é
+        ˆø”1 objF”š”­‚·‚éBomb‚Ü‚½‚Í“G‹@ƒCƒ“ƒXƒ^ƒ“ƒX
+        ˆø”2 lifeF”š”­ŠÔ
+        """
+        super().__init__()
+        img = pg.image.load(f"fig/explosion.gif")
+        self.imgs = [img, pg.transform.flip(img, 1, 1)]
+        self.image = self.imgs[0]
+        self.rect = self.image.get_rect(center=obj.rect.center)
+        self.life = life
+
+    def update(self):
+        """
+        ”š”­ŠÔ‚ğ1Œ¸Z‚µ‚½”š”­Œo‰ßŠÔ_life‚É‰‚¶‚Ä”š”­‰æ‘œ‚ğØ‚è‘Ö‚¦‚é‚±‚Æ‚Å
+        ”š”­ƒGƒtƒFƒNƒg‚ğ•\Œ»‚·‚é
+        """
+        self.life -= 1
+        self.image = self.imgs[self.life//10%2]
+        if self.life < 0:
+            self.kill()
+
+
+class Enemy(pg.sprite.Sprite):
+    """
+    “G‹@‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+    """
+    imgs = [pg.image.load(f"fig/alien{i}.png") for i in range(1, 4)]
+    
+    def __init__(self):
+        super().__init__()
+        self.image = random.choice(__class__.imgs)
+        self.rect = self.image.get_rect()
+        self.rect.center = random.randint(0, WIDTH), 0
+        self.vy = +6
+        self.bound = random.randint(50, HEIGHT/2)  # ’â~ˆÊ’u
+        self.state = "down"  # ~‰ºó‘Ôor’â~ó‘Ô
+        self.interval = random.randint(50, 300)  # ”š’e“Š‰ºƒCƒ“ƒ^[ƒoƒ‹
+
+    def update(self):
+        """
+        “G‹@‚ğ‘¬“xƒxƒNƒgƒ‹self.vy‚ÉŠî‚Ã‚«ˆÚ“®i~‰ºj‚³‚¹‚é
+        ƒ‰ƒ“ƒ_ƒ€‚ÉŒˆ‚ß‚½’â~ˆÊ’u_bound‚Ü‚Å~‰º‚µ‚½‚çC_state‚ğ’â~ó‘Ô‚É•ÏX‚·‚é
+        ˆø” screenF‰æ–ÊSurface
+        """
+        if self.rect.centery > self.bound:
+            self.vy = 0
+            self.state = "stop"
+        self.rect.centery += self.vy
+
+
+# class Gravity(pg.sprite.Sprite):
+#     """
+#     ‰æ–Ê‘S‘Ì‚É¶¬‚³‚ê‚éd—Íê‚ÉŠÖ‚·‚éƒNƒ‰ƒX
+#     """
+#     def __init__(self, life):
+#         """
+#         ‰æ–Ê‘S‘Ì‚Éd—Íê‚ğ¶¬‚·‚é
+#         ˆø” lifeF”­“®ŠÔ
+#         """  
+#         super().__init__()
+#         self.image = pg.Surface((WIDTH, HEIGHT))
+#         pg.draw.rect(self.image, (0, 0, 0), (0, 0, WIDTH, HEIGHT))
+#         self.image.set_alpha(200)
+#         self.rect = self.image.get_rect()
+#         self.life = life
+
+#     def update(self):
+#         """
+#         ”­“®ŠÔ‚ğ1Œ¸Z‚µC”­“®ŠÔ’†‚Íd—Íê‚ğ—LŒø‚É‚·‚é
+#         """
+#         self.life -= 1
+#         if self.life < 0:
+#             self.kill()
+
+
+class Score:
+    """
+    ‘Å‚¿—‚Æ‚µ‚½”š’eC“G‹@‚Ì”‚ğƒXƒRƒA‚Æ‚µ‚Ä•\¦‚·‚éƒNƒ‰ƒX
+    ”š’eF1“_
+    “G‹@F10“_
+    """
+    def __init__(self):
+        self.font = pg.font.Font(None, 50)
+        self.color = (0, 0, 255)
+        self.value = 0
+        self.image = self.font.render(f"Score: {self.value}", 0, self.color)
+        self.rect = self.image.get_rect()
+        self.rect.center = 100, HEIGHT-50
+
+    def update(self, screen: pg.Surface):
+        self.image = self.font.render(f"Score: {self.value}", 0, self.color)
+        screen.blit(self.image, self.rect)
+
+
+def main():
+    pg.display.set_caption("^I‚±‚¤‚©‚Æ‚ñ–³‘o")
+    screen = pg.display.set_mode((WIDTH, HEIGHT))
+    bg_img = pg.image.load(f"fig/pg_bg.jpg")
+    score = Score()
+
+    bird = Bird(3, (900, 400))
+    bombs = pg.sprite.Group()
+    beams = pg.sprite.Group()
+    exps = pg.sprite.Group()
+    emys = pg.sprite.Group()
+    #gras=pg.sprite.Group()
+
+    tmr = 0
+    clock = pg.time.Clock()
+    while True:
+        key_lst = pg.key.get_pressed()
+        for event in pg.event.get():
+            if event.type == pg.QUIT:
+                return 0
+            if event.type == pg.KEYDOWN and event.key == pg.K_SPACE:
+                beams.add(Beam(bird))
+            # if event.type == pg.KEYDOWN and event.key == pg.K_RETURN:
+            #     if score.value > 200:
+            #         gras.add(Gravity(400))
+            #         score.value -= 200
+            # if event.type == pg.KEYDOWN and event.key == pg.K_RSHIFT:
+            #     if score.value > -1000:
+            #         bird.state = "hyper"
+            #         bird.hyper_life = 500
+            #         score.value -= 100
+        screen.blit(bg_img, [0, 0])
+
+        if tmr%200 == 0:  # 200ƒtƒŒ[ƒ€‚É1‰ñC“G‹@‚ğoŒ»‚³‚¹‚é
+            emys.add(Enemy())
+
+        for emy in emys:
+            if emy.state == "stop" and tmr%emy.interval == 0:
+                # “G‹@‚ª’â~ó‘Ô‚É“ü‚Á‚½‚çCinterval‚É‰‚¶‚Ä”š’e“Š‰º
+                bombs.add(Bomb(emy, bird))
+
+        for emy in pg.sprite.groupcollide(emys, beams, True, True).keys():
+            exps.add(Explosion(emy, 100))  # ”š”­ƒGƒtƒFƒNƒg
+            score.value += 10  # 10“_ƒAƒbƒv
+            bird.change_img(6, screen)  # ‚±‚¤‚©‚Æ‚ñŠì‚ÑƒGƒtƒFƒNƒg
+
+        for bomb in pg.sprite.groupcollide(bombs, beams, True, True).keys():
+            exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+            score.value += 1  # 1“_ƒAƒbƒv
+        
+        # for bomb in pg.sprite.groupcollide(bombs, gras, True, False):
+        #     exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+        #     score.value += 1  # 1“_ƒAƒbƒv
+        # for emy in pg.sprite.groupcollide(emys, gras, True, False):
+        #     exps.add(Explosion(emy, 100))  # ”š”­ƒGƒtƒFƒNƒg
+        #     score.value += 1  # 1“_ƒAƒbƒv
+        #     bird.change_img(6, screen)  # ‚±‚¤‚©‚Æ‚ñŠì‚ÑƒGƒtƒFƒNƒg
+
+        # for bomb in pg.sprite.spritecollide(bird, bombs, True):
+        #     if bird.state == "normal":
+        #         bird.change_img(8, screen) # ‚±‚¤‚©‚Æ‚ñ”ß‚µ‚İƒGƒtƒFƒNƒg
+        #         score.update(screen)
+        #         pg.display.update()
+        #         time.sleep(2)
+        #         return
+        #     if bird.state == "hyper":
+        #         exps.add(Explosion(bomb, 50))  # ”š”­ƒGƒtƒFƒNƒg
+        #         score.value += 1  # 1“_ƒAƒbƒv
 
         # gras.update()
         # gras.draw(screen)
